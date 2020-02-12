@@ -1,5 +1,5 @@
 install:
-	install-deps
+	npm ci
 localinstall:
 	npm install
 start: build test-coverage lintfix
