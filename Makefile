@@ -1,4 +1,6 @@
 install:
+	install-deps
+localinstall:
 	npm install
 start: build test-coverage lintfix
 publish:
@@ -10,6 +12,8 @@ lint:
 	npx eslint .
 lintfix:
 	npx eslint --fix .
+test:
+	npm test
 test-coverage:
 	npm test -- --coverage
 link:
