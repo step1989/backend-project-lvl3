@@ -2,7 +2,6 @@
 /dist/
 *.log
 *.save
-*.html
 *.directory
 coverage/
 .vscode
