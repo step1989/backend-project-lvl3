@@ -1,29 +1,34 @@
 import { promises as fs } from 'fs';
-import url from 'url';
 import path from 'path';
-import { flattenDeep } from 'lodash';
 import load from './loader';
 import convertDOM from './converterDom';
+import UrlHelper from './UrlHelper';
+
+const debug = require('debug')('page-loader: index');
 
 const defaultOutputDir = process.cwd();
 
 const getPathFile = (fileName, dir, extension = 'html') => path.join(dir, `${fileName}.${extension}`);
 const getPathResourses = (dirname, dir, postfix = '_files') => path.join(dir, `${dirname}${postfix}`);
 
-const pageloader = (uri, outputDir = defaultOutputDir) => {
-  const { host, pathname, protocol } = url.parse(uri);
-  // выглядит страшно - переделать - вынести в отдельную функцию - нужна для использования в тестах
-  const fileName = flattenDeep([host.split('.'), pathname.split('/')]).filter((el) => el !== '').join('-');
+const pageloader = (href, outputDir = defaultOutputDir) => {
+  debug('Start app');
+  const myUrl = new UrlHelper(href);
+  const fileName = myUrl.getFileName();
   const pathFile = getPathFile(fileName, outputDir);
-  const base = `${protocol}//${host}`;
+  const base = myUrl.getOrigin();
   const resoursesDir = getPathResourses(fileName, outputDir);
-  const response = load(uri);
-  return response
+  debug('Start load page');
+  const responsePromise = load(href);
+  return responsePromise
     .then(({ data }) => {
       const html = convertDOM(data, base, resoursesDir);
       fs.writeFile(pathFile, html, { flags: 'wx' }, 'utf8');
     })
-    .then(() => `Open ${outputDir}`)
+    .then(() => {
+      debug('A page is full download');
+      return `Open ${outputDir}`;
+    })
     .catch((error) => console.log(`Ошибка при записи html ${error}`));
 };
 

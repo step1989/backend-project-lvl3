@@ -18,3 +18,5 @@ test-coverage:
 	npm test -- --coverage
 link:
 	npm link
+debug:
+	DEBUG=page-loader:* dist/bin/page-loader.js -o /tmp https://git-scm.com/downloads

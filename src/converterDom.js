@@ -2,6 +2,7 @@ import cheerio from 'cheerio';
 import path from 'path';
 import { promises as fs } from 'fs';
 import load from './loader';
+import UrlHelper from './UrlHelper';
 
 
 const mappingTag = {
@@ -10,39 +11,40 @@ const mappingTag = {
   link: 'href',
 };
 
-const getPathFile = (fileName, dir) => path.join(dir, `${fileName}`);
+const debug = require('debug')('page-loader: DOM');
 
-// const getFileName = (pathFile) => {
-//   const { base } = path.parse(pathFile);
-//   return base;
-// };
+const getFilePath = (fileName, dir) => path.join(dir, `${fileName}`);
 
-const getRelativePathFile = (pathFile) => {
-  const { dir, base } = path.parse(pathFile);
+const getRelativeFilePath = (filePath) => {
+  const { dir, base } = path.parse(filePath);
   const segments = dir.split('/');
   const endSegment = segments[segments.length - 1];
   return path.join(endSegment, base);
 };
 
-const hasRelativePathFile = (origin, base) => origin === base;
-
 const convertDOM = (data, base, outputDir) => {
   const $ = cheerio.load(data, { decodeEntities: false, xmlMode: true });
+  debug('DOM is load');
   fs.mkdir(outputDir, { recursive: true });
   const promises = [];
   $('img, script, link').each((index, el) => {
     const link = $(el).attr(mappingTag[el.name]);
     if (link) {
-      const { origin, href } = new URL(link, base);
-      if (hasRelativePathFile(origin, base)) {
+      const resourseUrl = new UrlHelper(link, base);
+      debug(`Getting resourse url - ${link}`);
+      if (resourseUrl.hasRelativeFilePath(base)) {
         const { base: fileName } = path.parse(link);
-        const pathFile = getPathFile(fileName, outputDir);
-        const relativePathFile = getRelativePathFile(pathFile);
-        const response = load(href, 'arraybuffer');
+        const filePath = getFilePath(fileName, outputDir);
+        const relativefilePath = getRelativeFilePath(filePath);
+        debug(`relativefilePath - ${filePath}`);
+        const response = load(resourseUrl.getHref(), 'arraybuffer');
+        debug('start added promise write resourse file');
         response
-          .then(({ data: linkData }) => promises.push(fs.writeFile(pathFile, linkData, { flags: 'wx' }, 'utf8')))
+          .then(({ data: linkData }) => {
+            promises.push(fs.writeFile(filePath, linkData, { flags: 'wx' }, 'utf8'));
+          })
           .catch((error) => console.log(`'Ошибка при записи файла' - ${error}`));
-        $(el).attr(mappingTag[el.name], relativePathFile);
+        $(el).attr(mappingTag[el.name], relativefilePath);
       }
     }
   });

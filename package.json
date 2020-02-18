@@ -10,13 +10,15 @@
     "dist"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "DEBUG=page-loader:* jest",
     "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
     "prepublishOnly": "npm run build"
   },
   "jest": {
     "testEnvironment": "node",
-    "testPathIgnorePatterns": ["__tests__/__fixtures__/script.js"]
+    "testPathIgnorePatterns": [
+      "__tests__/__fixtures__/script.js"
+    ]
   },
   "repository": {
     "type": "git",
@@ -30,9 +32,10 @@
   "homepage": "https://github.com/step1989/backend-project-lvl3#readme",
   "dependencies": {
     "axios": "*",
+    "axios-debug-log": "^0.6.2",
     "cheerio": "^1.0.0-rc.3",
     "commander": "^4.0.1",
-    "lodash": "^4.17.15"
+    "debug": "^4.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
