@@ -1,8 +1,9 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import load from './loader';
-import convertDOM from './converterDom';
+import hanleDOM from './converterDom';
 import UrlHelper from './UrlHelper';
+import resourseLoad from './resourseLoader';
 
 const debug = require('debug')('page-loader: index');
 
@@ -18,18 +19,24 @@ const pageloader = (href, outputDir = defaultOutputDir) => {
   const pathFile = getPathFile(fileName, outputDir);
   const base = myUrl.getOrigin();
   const resoursesDir = getPathResourses(fileName, outputDir);
+  debug(`resoursesDir - ${resoursesDir}`);
+  const resourseDirProm = fs.mkdir(resoursesDir, { recursive: true });
   debug('Start load page');
   const responsePromise = load(href);
-  return responsePromise
+  return resourseDirProm
+    .then(() => responsePromise)
     .then(({ data }) => {
-      const html = convertDOM(data, base, resoursesDir);
-      fs.writeFile(pathFile, html, { flags: 'wx' }, 'utf8');
+      debug(`html before - \n${data}`);
+      const [html, resoursesLink] = hanleDOM(data, base, resoursesDir);
+      debug(`html after - \n${html}`);
+      const writehHtmlProm = fs.writeFile(pathFile, html, 'utf8');
+      const loadAndWriteResProm = resourseLoad(resoursesLink);
+      return Promise.all([writehHtmlProm, loadAndWriteResProm]);
     })
     .then(() => {
       debug('A page is full download');
       return `Open ${outputDir}`;
-    })
-    .catch((error) => console.log(`Ошибка при записи html ${error}`));
+    });
 };
 
 export default pageloader;
