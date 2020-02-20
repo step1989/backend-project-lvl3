@@ -80,8 +80,4 @@ describe('download page test', () => {
   test('not found page test', async () => {
     await expect(pageloader('http://government.ru/notfound')).rejects.toMatchObject({ code: '404' });
   });
-
-  test('not access path test', async () => {
-    await expect(pageloader(testUrl, '/boot')).rejects.toMatchObject({ code: 'ENOENT' });
-  });
 });
