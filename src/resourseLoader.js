@@ -14,7 +14,7 @@ const resoursesLoad = (links) => {
     const writePromise = downloadPromise.then(({ data }) => {
       const task = new Listr([
         {
-          title: `Success download resourse file ${href} to:\n ${filePath}`,
+          title: `Download resourse file ${href} to:\n ${filePath}`,
           task: () => fs.writeFile(filePath, data, 'utf8'),
         },
       ]);

@@ -22,9 +22,9 @@ const pageloader = (href, outputDir = defaultOutputDir) => {
   return resourseDirPromise
     .then(() => responsePromise)
     .then(({ data }) => {
-      debug(`html before - \n${data}`);
+      debug(`Resource file directory created - ${resoursesDir}`);
+      debug('Main HTML loaded into memory');
       const [html, resoursesLink] = hanleDOM(data, base, resoursesDir);
-      debug(`html after - \n${html}`);
       const writehHtmlPromise = fs.writeFile(pathFile, html, 'utf8');
       const loadAndWriteResPromise = resoursesLoad(resoursesLink);
       return Promise.all([writehHtmlPromise, loadAndWriteResPromise]);

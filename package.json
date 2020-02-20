@@ -1,10 +1,10 @@
 {
-  "name": "project3",
+  "name": "downloader-web-page-rsv",
   "version": "1.0.0",
   "description": "Downloader a page",
   "main": "index.js",
   "bin": {
-    "gendiff": "dist/bin/page-loader.js"
+    "page-loader": "dist/bin/page-loader.js"
   },
   "files": [
     "dist"
