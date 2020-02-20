@@ -8,16 +8,8 @@ class UrlHelper {
     return this.url.host;
   }
 
-  getBase() {
-    return this.url.base;
-  }
-
   getPathName() {
     return this.url.pathname;
-  }
-
-  getProtocol() {
-    return this.url.protocol;
   }
 
   getOrigin() {
