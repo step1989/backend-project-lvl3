@@ -2,7 +2,7 @@ import path from 'path';
 import os from 'os';
 import nock from 'nock';
 import { promises as fs } from 'fs';
-import pageloader from '../src';
+import pageLoad from '../src';
 
 const checkInfDebug = require('debug')('page-loader: check information message test');
 const dataComparisonDebug = require('debug')('page-loader: data comparison test');
@@ -11,17 +11,17 @@ const fixturesPath = `${__dirname}/__fixtures__/`;
 const testUrl = 'http://government.ru/docs';
 const resultName = 'government-ru-docs';
 const resoursesDirName = 'government-ru-docs_files';
-const getPathFile = (fileName, extension, pathdir = fixturesPath) => path.join(pathdir, `${fileName}${extension}`);
+const getFilePath = (fileName, extension, pathdir = fixturesPath) => path.join(pathdir, `${fileName}${extension}`);
 let outputDir;
 
 describe('download page test', () => {
   beforeAll(async () => {
     nock.disableNetConnect();
 
-    const htmlData = await fs.readFile(getPathFile('example', '.html'), 'utf8');
-    const cssData = await fs.readFile(getPathFile('style', '.css'), 'utf8');
-    const scriptData = await fs.readFile(getPathFile('script.js', '.test'), 'utf8');
-    const imgData = await fs.readFile(getPathFile('test', '.png'));
+    const htmlData = await fs.readFile(getFilePath('example', '.html'), 'utf8');
+    const cssData = await fs.readFile(getFilePath('style', '.css'), 'utf8');
+    const scriptData = await fs.readFile(getFilePath('script.js', '.test'), 'utf8');
+    const imgData = await fs.readFile(getFilePath('test', '.png'));
 
     nock('http://government.ru')
       .persist()
@@ -45,15 +45,11 @@ describe('download page test', () => {
     outputDir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
   });
 
-  afterAll(() => {
-    nock.enableNetConnect();
-  });
-
   test('check information message', async () => {
     checkInfDebug('Start test');
     checkInfDebug(`Output dir = ${outputDir}`);
     const expected = `Open ${outputDir}`;
-    await expect(pageloader(testUrl, outputDir)).resolves.toBe(expected);
+    await expect(pageLoad(testUrl, outputDir)).resolves.toBe(expected);
     checkInfDebug('Stop test');
   });
 
@@ -63,21 +59,20 @@ describe('download page test', () => {
     const resoursesDir = path.join(outputDir, resoursesDirName);
     dataComparisonDebug(`resourses dir = ${resoursesDir}`);
 
-    await pageloader(testUrl, outputDir);
-    const recievedFile = getPathFile(resultName, '.html', outputDir);
+    await pageLoad(testUrl, outputDir);
+    const recievedFile = getFilePath(resultName, '.html', outputDir);
     const reсievedData = await fs.readFile(recievedFile, 'utf8');
     dataComparisonDebug('get test data');
-    const expectedFile = getPathFile('result', '.html');
+    const expectedFile = getFilePath('result', '.html');
     const expectedData = await fs.readFile(expectedFile, 'utf8');
     dataComparisonDebug('get snapshot data');
     const files = await fs.readdir(resoursesDir);
     dataComparisonDebug(`get files - ${files}`);
-    expect(files).not.toHaveLength(0);
+    expect(files).toHaveLength(3);
     expect(reсievedData).toEqual(expectedData);
-    dataComparisonDebug('Stop test');
   });
 
   test('not found page test', async () => {
-    await expect(pageloader('http://government.ru/notfound')).rejects.toMatchObject({ code: '404' });
+    await expect(pageLoad('http://government.ru/notfound', outputDir)).rejects.toMatchObject({ code: '404' });
   });
 });

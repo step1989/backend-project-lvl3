@@ -6,7 +6,7 @@ import load from './loader';
 const debug = require('debug')('page-loader: resourseLoader');
 
 const resoursesLoad = (links) => {
-  const promises = links.reduce((acc, val) => {
+  const promises = links.map((val) => {
     const [href, filePath] = Object.values(val);
     debug(`href - ${href}`);
     debug(`filePath - ${filePath}`);
@@ -20,7 +20,7 @@ const resoursesLoad = (links) => {
       ]);
       return task.run();
     });
-    return [...acc, writePromise];
+    return writePromise;
   }, []);
   return Promise.all(promises);
 };

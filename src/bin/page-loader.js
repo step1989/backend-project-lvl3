@@ -2,6 +2,7 @@
 import program from 'commander';
 import pageloader from '..';
 
+const defaultOutputDir = process.cwd();
 const errorMapper = {
   ENOENT: () => console.error('error: - no such file or directory. Please, check path'),
   ENOTFOUND: (e) => console.error(`error: host not found - ${e.hostname}. Please check link`),
@@ -11,7 +12,7 @@ const errorMapper = {
 
 program.version('1.0.1')
   .description('Downloader a web pages')
-  .option('-o, --output [path]', 'output folder')
+  .option('-o, --output [path]', 'output folder', defaultOutputDir)
   .arguments('<path>')
   .action((path, option) => {
     pageloader(path, option.output).then(console.log).catch((e) => {

@@ -1,22 +1,29 @@
 import { promises as fs } from 'fs';
+import path from 'path';
 import load from './loader';
-import PathHelper from './PathHelper';
 import hanleDOM from './handleDom';
-import UrlHelper from './UrlHelper';
 import resoursesLoad from './resourseLoader';
 
 const debug = require('debug')('page-loader: index');
 
-const defaultOutputDir = process.cwd();
-const extension = '.html';
+const getMainFileName = (url) => {
+  const segments = [
+    url.host.split('.'),
+    url.pathname.split('/')].flat();
+  const filteredSegments = segments.filter((el) => el !== '');
+  return filteredSegments.join('-');
+};
 
-const pageloader = (href, outputDir = defaultOutputDir) => {
+const getFilePath = (dir, fileName, extension) => path.join(dir, `${fileName}${extension}`);
+const getResoursesPath = (dir, dirname, postfix = '_files') => path.join(dir, `${dirname}${postfix}`);
+
+const pageLoad = (href, outputDir) => {
   debug('Start app');
-  const url = new UrlHelper(href);
-  const fileName = url.getFileName();
-  const pathFile = PathHelper.getFilePath(outputDir, fileName, extension);
-  const base = url.getOrigin();
-  const resoursesDir = PathHelper.getPathResourses(outputDir, fileName);
+  const url = new URL(href);
+  const fileName = getMainFileName(url);
+  const filePath = getFilePath(outputDir, fileName, '.html');
+  const base = url.origin;
+  const resoursesDir = getResoursesPath(outputDir, fileName);
   const resourseDirPromise = fs.mkdir(resoursesDir, { recursive: true });
   const responsePromise = load(href);
   return resourseDirPromise
@@ -25,7 +32,7 @@ const pageloader = (href, outputDir = defaultOutputDir) => {
       debug(`Resource file directory created - ${resoursesDir}`);
       debug('Main HTML loaded into memory');
       const [html, resoursesLink] = hanleDOM(data, base, resoursesDir);
-      const writehHtmlPromise = fs.writeFile(pathFile, html, 'utf8');
+      const writehHtmlPromise = fs.writeFile(filePath, html, 'utf8');
       const loadAndWriteResPromise = resoursesLoad(resoursesLink);
       return Promise.all([writehHtmlPromise, loadAndWriteResPromise]);
     })
@@ -35,4 +42,4 @@ const pageloader = (href, outputDir = defaultOutputDir) => {
     });
 };
 
-export default pageloader;
+export default pageLoad;

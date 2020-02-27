@@ -1,6 +1,7 @@
 import cheerio from 'cheerio';
-import PathHelper from './PathHelper';
-import UrlHelper from './UrlHelper';
+import path from 'path';
+
+const debug = require('debug')('page-loader: DOM');
 
 const mappingTag = {
   img: 'src',
@@ -8,25 +9,36 @@ const mappingTag = {
   link: 'href',
 };
 
-const debug = require('debug')('page-loader: DOM');
+const hasRelativeFilePath = (url, base) => url.origin === base;
+const getRelativeFilePath = (filePath) => {
+  const { dir, base } = path.parse(filePath);
+  const segments = dir.split('/');
+  const endSegment = segments[segments.length - 1];
+  return path.join(endSegment, base);
+};
+const getFilePath = (dir, fileName, extension) => path.join(dir, `${fileName}${extension}`);
 
 const hanleDOM = (data, base, outputDir) => {
   const $ = cheerio.load(data, { decodeEntities: false, xmlMode: false });
   debug('DOM is load in cherio');
   const resoursesLinks = [];
-  $('img, script, link').filter('[src],[href]').each((index, el) => {
-    const link = $(el).attr(mappingTag[el.name]);
-    const resourseUrl = new UrlHelper(link, base);
-    debug(`Resourse url - ${link}`);
-    if (resourseUrl.hasRelativeFilePath(base)) {
-      const { name, ext } = PathHelper.parse(link);
-      const filePath = PathHelper.getFilePath(outputDir, name, ext);
-      const resourseLink = resourseUrl.getHref();
-      const relativefilePath = PathHelper.getRelativeFilePath(filePath);
-      debug(`relativefilePath - ${filePath}`);
-      resoursesLinks.push({ link: resourseLink, filePath });
-      $(el).attr(mappingTag[el.name], relativefilePath);
-    }
+  Object.entries(mappingTag).forEach(([tag, attribut]) => {
+    debug(`entries - ${tag} ${attribut}`);
+    $(tag).each((index, el) => {
+      const link = $(el).attr(attribut);
+      debug(`link - ${link}`);
+      const resourseUrl = new URL(link, base);
+      debug(`Resourse url - ${resourseUrl}`);
+      if (link && hasRelativeFilePath(resourseUrl, base)) {
+        const { name, ext } = path.parse(link);
+        const filePath = getFilePath(outputDir, name, ext);
+        const resourseLink = resourseUrl.href;
+        const relativefilePath = getRelativeFilePath(filePath);
+        debug(`relativefilePath - ${filePath}`);
+        resoursesLinks.push({ link: resourseLink, filePath });
+        $(el).attr(mappingTag[el.name], relativefilePath);
+      }
+    });
   });
   return [$.root().html(), resoursesLinks];
 };
