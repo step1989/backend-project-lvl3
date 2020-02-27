@@ -8,8 +8,7 @@ const load = (href, type = 'json') => {
     url: href,
     responseType: type,
   };
-  const loader = axios.create(parametrsAxios);
-  return loader();
+  return axios.create(parametrsAxios)();
 };
 
 export default load;
