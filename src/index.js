@@ -14,7 +14,6 @@ const getMainFileName = (url) => {
   return filteredSegments.join('-');
 };
 
-
 const getFilePath = (dir, fileName, extension) => path.join(dir, `${fileName}${extension}`);
 const getResoursesPath = (dir, dirname, postfix = '_files') => path.join(dir, `${dirname}${postfix}`);
 
