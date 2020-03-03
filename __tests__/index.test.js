@@ -62,14 +62,11 @@ describe('download page test', () => {
     await loadPage(testUrl, outputFolder);
     const recievedFile = getFilePath(resultName, '.html', outputFolder);
     const reсievedData = await fs.readFile(recievedFile, 'utf8');
-    dataComparisonDebug('get test data');
-    const expectedFile = getFilePath('result', '.html');
-    const expectedData = await fs.readFile(expectedFile, 'utf8');
-    dataComparisonDebug('get snapshot data');
     const files = await fs.readdir(resoursesDir);
     dataComparisonDebug(`get files - ${files}`);
     expect(files).toHaveLength(3);
-    expect(reсievedData).toEqual(expectedData);
+    // expect(reсievedData).toEqual(expectedData);
+    expect(reсievedData).toMatchSnapshot();
   });
 
   test('not found page test', async () => {
