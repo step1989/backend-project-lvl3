@@ -17,7 +17,7 @@ const getMainFileName = (url) => {
 const getFilePath = (dir, fileName, extension) => path.join(dir, `${fileName}${extension}`);
 const getResoursesPath = (dir, dirname, postfix = '_files') => path.join(dir, `${dirname}${postfix}`);
 
-const pageLoad = (href, outputDir) => {
+const loadPage = (href, outputDir) => {
   debug('Start app');
   const url = new URL(href);
   const fileName = getMainFileName(url);
@@ -42,4 +42,4 @@ const pageLoad = (href, outputDir) => {
     });
 };
 
-export default pageLoad;
+export default loadPage;

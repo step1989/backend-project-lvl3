@@ -2,7 +2,7 @@ import path from 'path';
 import os from 'os';
 import nock from 'nock';
 import { promises as fs } from 'fs';
-import pageLoad from '../src';
+import loadPage from '../src';
 
 const checkInfDebug = require('debug')('page-loader: check information message test');
 const dataComparisonDebug = require('debug')('page-loader: data comparison test');
@@ -49,7 +49,7 @@ describe('download page test', () => {
     checkInfDebug('Start test');
     checkInfDebug(`Output dir = ${outputDir}`);
     const expected = `Open ${outputDir}`;
-    await expect(pageLoad(testUrl, outputDir)).resolves.toBe(expected);
+    await expect(loadPage(testUrl, outputDir)).resolves.toBe(expected);
     checkInfDebug('Stop test');
   });
 
@@ -59,7 +59,7 @@ describe('download page test', () => {
     const resoursesDir = path.join(outputDir, resoursesDirName);
     dataComparisonDebug(`resourses dir = ${resoursesDir}`);
 
-    await pageLoad(testUrl, outputDir);
+    await loadPage(testUrl, outputDir);
     const recievedFile = getFilePath(resultName, '.html', outputDir);
     const reсievedData = await fs.readFile(recievedFile, 'utf8');
     dataComparisonDebug('get test data');
@@ -73,6 +73,6 @@ describe('download page test', () => {
   });
 
   test('not found page test', async () => {
-    await expect(pageLoad('http://government.ru/notfound', outputDir)).rejects.toMatchObject({ code: '404' });
+    await expect(loadPage('http://government.ru/notfound', outputDir)).rejects.toMatchObject({ code: '404' });
   });
 });

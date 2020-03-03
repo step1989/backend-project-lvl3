@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import program from 'commander';
-import pageloader from '..';
+import loadPage from '..';
 
 const defaultOutputDir = process.cwd();
 const errorMapper = {
@@ -15,7 +15,7 @@ program.version('1.0.1')
   .option('-o, --output [path]', 'output folder', defaultOutputDir)
   .arguments('<path>')
   .action((path, option) => {
-    pageloader(path, option.output).then(console.log).catch((e) => {
+    loadPage(path, option.output).then(console.log).catch((e) => {
       if (e.code) {
         errorMapper[e.code](e);
       } else {
