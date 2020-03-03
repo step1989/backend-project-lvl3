@@ -65,7 +65,6 @@ describe('download page test', () => {
     const files = await fs.readdir(resoursesDir);
     dataComparisonDebug(`get files - ${files}`);
     expect(files).toHaveLength(3);
-    // expect(reсievedData).toEqual(expectedData);
     expect(reсievedData).toMatchSnapshot();
   });
 
