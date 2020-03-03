@@ -15,7 +15,7 @@ program.version('1.0.1')
   .option('-o, --output [path]', 'output folder', defaultOutputDir)
   .arguments('<path>')
   .action((path, option) => {
-    loadPage(path, option.output).then(console.log).catch((e) => {
+    loadPage(path, option.output).then((outputFolder) => console.log(`Open ${outputFolder}`)).catch((e) => {
       if (e.code) {
         errorMapper[e.code](e);
       } else {

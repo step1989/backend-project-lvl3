@@ -12,7 +12,7 @@ const testUrl = 'http://government.ru/docs';
 const resultName = 'government-ru-docs';
 const resoursesDirName = 'government-ru-docs_files';
 const getFilePath = (fileName, extension, pathdir = fixturesPath) => path.join(pathdir, `${fileName}${extension}`);
-let outputDir;
+let outputFolder;
 
 describe('download page test', () => {
   beforeAll(async () => {
@@ -42,25 +42,25 @@ describe('download page test', () => {
   });
 
   beforeEach(async () => {
-    outputDir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
+    outputFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
   });
 
   test('check information message', async () => {
     checkInfDebug('Start test');
-    checkInfDebug(`Output dir = ${outputDir}`);
-    const expected = `Open ${outputDir}`;
-    await expect(loadPage(testUrl, outputDir)).resolves.toBe(expected);
+    checkInfDebug(`Output dir = ${outputFolder}`);
+    const expected = outputFolder;
+    await expect(loadPage(testUrl, outputFolder)).resolves.toBe(expected);
     checkInfDebug('Stop test');
   });
 
   test('check data comparison', async () => {
     dataComparisonDebug('Start test');
-    dataComparisonDebug(`Output dir = ${outputDir}`);
-    const resoursesDir = path.join(outputDir, resoursesDirName);
+    dataComparisonDebug(`Output dir = ${outputFolder}`);
+    const resoursesDir = path.join(outputFolder, resoursesDirName);
     dataComparisonDebug(`resourses dir = ${resoursesDir}`);
 
-    await loadPage(testUrl, outputDir);
-    const recievedFile = getFilePath(resultName, '.html', outputDir);
+    await loadPage(testUrl, outputFolder);
+    const recievedFile = getFilePath(resultName, '.html', outputFolder);
     const reсievedData = await fs.readFile(recievedFile, 'utf8');
     dataComparisonDebug('get test data');
     const expectedFile = getFilePath('result', '.html');
@@ -73,6 +73,6 @@ describe('download page test', () => {
   });
 
   test('not found page test', async () => {
-    await expect(loadPage('http://government.ru/notfound', outputDir)).rejects.toMatchObject({ code: '404' });
+    await expect(loadPage('http://government.ru/notfound', outputFolder)).rejects.toMatchObject({ code: '404' });
   });
 });

@@ -17,13 +17,13 @@ const getMainFileName = (url) => {
 const getFilePath = (dir, fileName, extension) => path.join(dir, `${fileName}${extension}`);
 const getResoursesPath = (dir, dirname, postfix = '_files') => path.join(dir, `${dirname}${postfix}`);
 
-const loadPage = (href, outputDir) => {
+const loadPage = (href, outputFolder) => {
   debug('Start app');
   const url = new URL(href);
   const fileName = getMainFileName(url);
-  const filePath = getFilePath(outputDir, fileName, '.html');
+  const filePath = getFilePath(outputFolder, fileName, '.html');
   const base = url.origin;
-  const resoursesDir = getResoursesPath(outputDir, fileName);
+  const resoursesDir = getResoursesPath(outputFolder, fileName);
   const resourseDirPromise = fs.mkdir(resoursesDir, { recursive: true });
   const responsePromise = load(href);
   return resourseDirPromise
@@ -39,7 +39,7 @@ const loadPage = (href, outputDir) => {
     })
     .then(() => {
       debug('A page is full download');
-      return `Open ${outputDir}`;
+      return outputFolder;
     });
 };
 

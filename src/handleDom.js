@@ -32,7 +32,7 @@ const getResoursesLinks = (data, base) => {
   return relativeLinks;
 };
 
-const handleDOM = (data, base, outputDir) => {
+const handleDOM = (data, base, outputFolder) => {
   const $ = getDOM(data);
   debug('DOM is load in cherio for change');
   Object.entries(mappingTag).forEach(([tag, attribut]) => {
@@ -42,7 +42,7 @@ const handleDOM = (data, base, outputDir) => {
       const resourseUrl = new URL(link, base);
       if (hasRelativeFilePath(resourseUrl, base)) {
         const { name, ext } = path.parse(link);
-        const filePath = getFilePath(outputDir, name, ext);
+        const filePath = getFilePath(outputFolder, name, ext);
         const relativefilePath = getRelativeFilePath(filePath);
         debug(`relativefilePath - ${filePath}`);
         $(el).attr(mappingTag[el.name], relativefilePath);
