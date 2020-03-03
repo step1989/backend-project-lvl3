@@ -17,30 +17,39 @@ const getRelativeFilePath = (filePath) => {
   return path.join(endSegment, base);
 };
 const getFilePath = (dir, fileName, extension) => path.join(dir, `${fileName}${extension}`);
+const getDOM = (data) => cheerio.load(data, { decodeEntities: false, xmlMode: false });
 
-const hanleDOM = (data, base, outputDir) => {
-  const $ = cheerio.load(data, { decodeEntities: false, xmlMode: false });
-  debug('DOM is load in cherio');
-  const resoursesLinks = [];
+const getResoursesLinks = (data, base) => {
+  const $ = getDOM(data);
+  debug('DOM is load in cherio for get resourses links');
+  const allLinks = Object.entries(mappingTag).map(([tag, attribut]) => {
+    const links = $(tag).map((index, link) => $(link).attr(attribut)).get();
+    return links;
+  }).flat();
+  const allUrls = allLinks.map((link) => new URL(link, base));
+  const relativeLinks = allUrls.filter((link) => hasRelativeFilePath(link, base));
+  debug(`relativeLinks - ${relativeLinks}`);
+  return relativeLinks;
+};
+
+const handleDOM = (data, base, outputDir) => {
+  const $ = getDOM(data);
+  debug('DOM is load in cherio for change');
   Object.entries(mappingTag).forEach(([tag, attribut]) => {
-    debug(`entries - ${tag} ${attribut}`);
-    $(tag).each((index, el) => {
+    debug(`tag, attribut  - ${tag}, ${attribut}`);
+    $(tag).filter(`[${attribut}]`).each((index, el) => {
       const link = $(el).attr(attribut);
-      debug(`link - ${link}`);
       const resourseUrl = new URL(link, base);
-      debug(`Resourse url - ${resourseUrl}`);
-      if (link && hasRelativeFilePath(resourseUrl, base)) {
+      if (hasRelativeFilePath(resourseUrl, base)) {
         const { name, ext } = path.parse(link);
         const filePath = getFilePath(outputDir, name, ext);
-        const resourseLink = resourseUrl.href;
         const relativefilePath = getRelativeFilePath(filePath);
         debug(`relativefilePath - ${filePath}`);
-        resoursesLinks.push({ link: resourseLink, filePath });
         $(el).attr(mappingTag[el.name], relativefilePath);
       }
     });
   });
-  return [$.root().html(), resoursesLinks];
+  return $.root().html();
 };
 
-export default hanleDOM;
+export { handleDOM, getResoursesLinks };

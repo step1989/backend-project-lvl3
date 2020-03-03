@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import load from './loader';
-import hanleDOM from './handleDom';
+import { handleDOM, getResoursesLinks } from './handleDom';
 import resoursesLoad from './resourseLoader';
 
 const debug = require('debug')('page-loader: index');
@@ -13,6 +13,7 @@ const getMainFileName = (url) => {
   const filteredSegments = segments.filter((el) => el !== '');
   return filteredSegments.join('-');
 };
+
 
 const getFilePath = (dir, fileName, extension) => path.join(dir, `${fileName}${extension}`);
 const getResoursesPath = (dir, dirname, postfix = '_files') => path.join(dir, `${dirname}${postfix}`);
@@ -31,9 +32,10 @@ const loadPage = (href, outputDir) => {
     .then(({ data }) => {
       debug(`Resource file directory created - ${resoursesDir}`);
       debug('Main HTML loaded into memory');
-      const [html, resoursesLink] = hanleDOM(data, base, resoursesDir);
+      const resoursesUrl = getResoursesLinks(data, base);
+      const html = handleDOM(data, base, resoursesDir);
       const writehHtmlPromise = fs.writeFile(filePath, html, 'utf8');
-      const loadAndWriteResPromise = resoursesLoad(resoursesLink);
+      const loadAndWriteResPromise = resoursesLoad(resoursesUrl, resoursesDir);
       return Promise.all([writehHtmlPromise, loadAndWriteResPromise]);
     })
     .then(() => {
