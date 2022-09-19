@@ -4,10 +4,17 @@ on:
   - workflow_dispatch
  
 jobs:
-  Hello_template:
+  Hello:
     if: github.event.repository.is_template == true
     runs-on: ubuntu-latest
     
     steps:
     - name: Hello
       run: echo "Hello, GitHub Actions. I am template!"
+  Buu:
+    needs: Hello
+    runs-on: ubuntu-latest
+    steps:
+    - name: Hu
+      run: echo "Buu"
+  
