@@ -18,9 +18,9 @@ jobs:
     - name: Hu
       run: echo "Buu"
   message-if-template:
-    needs: buu
+    needs: hello
     runs-on: ubuntu-latest
-    if: ${{ needs.build.result == 'skipped'}}
+    if: ${{ needs.hello.result == 'skipped'}}
     steps:
       - name: print
         run: "Buu is prohibited in the template"
