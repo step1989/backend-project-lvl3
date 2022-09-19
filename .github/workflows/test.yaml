@@ -5,14 +5,14 @@ on:
  
 jobs:
   Hello_template:
-    if: github.event.repository.is_template === true
+    if: github.event.repository.is_template == true
     runs-on: ubuntu-latest
     
     steps:
     - name: Hello
       run: echo "Hello, GitHub Actions. I am template!"    
   Hello_repo:
-    if: github.event.repository.is_template === false
+    if: github.event.repository.is_template == false
     runs-on: ubuntu-latest
     
     steps:
