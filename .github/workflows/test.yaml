@@ -19,7 +19,7 @@ jobs:
       run: echo "Buu"
   Message-if-template:
     runs-on: ubuntu-latest
-    if: steps.Buu.result === 'skipped'
+    if: ${{ cancelled() }}
     steps:
       - name: print
         run: "Buu is prohibited in the template"
