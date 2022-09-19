@@ -17,4 +17,10 @@ jobs:
     steps:
     - name: Hu
       run: echo "Buu"
+  Message-if-template:
+    runs-on: ubuntu-latest
+    if: jobs.Buu.result === 'skipped'
+    steps:
+      - name: print
+        run: "Buu is prohibited in the template"
   
