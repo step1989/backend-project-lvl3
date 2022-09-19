@@ -20,7 +20,7 @@ jobs:
   message-if-template:
     needs: buu
     runs-on: ubuntu-latest
-    if: ${{ needs.build.result == 'skiped'}}
+    if: ${{ needs.build.result == 'skipped'}}
     steps:
       - name: print
         run: "Buu is prohibited in the template"
