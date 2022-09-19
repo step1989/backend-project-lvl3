@@ -18,7 +18,6 @@ jobs:
     - name: Hu
       run: echo "Buu"
   message-if-template:
-    needs: hello
     runs-on: ubuntu-latest
     if: ${{ needs.hello.result == 'skipped'}}
     steps:
