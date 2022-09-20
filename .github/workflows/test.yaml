@@ -5,12 +5,12 @@ on:
  
 jobs:
   hello:
-    if: github.event.repository.is_template == true
+    if: $!{{github.event.repository.is_template}}
     runs-on: ubuntu-latest
     
     steps:
     - name: Hello
-      run: echo "Hello, GitHub Actions. I am template!"
+      run: echo "Hello, GitHub Actions. I am not template!"
   buu:
     needs: hello
     runs-on: ubuntu-latest
